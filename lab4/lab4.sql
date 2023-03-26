@@ -190,9 +190,26 @@ HAVING max_employees_in_company <= 10;
 
 -- 3.9 SELECT JOIN
 -- 3.9 a) LEFT JOIN двух таблиц и WHERE по одному из атрибутов
+SELECT c.name AS company_name, pd.name as name_of_project
+FROM company c
+	LEFT JOIN project_done pd ON c.id_company = pd.id_company;
+    
 -- 3.9 b) RIGHT JOIN. Получить такую же выборку, как и в (a)
+SELECT c.name AS company_name, pd.name as name_of_project
+FROM project_done pd
+	RIGHT JOIN company c ON c.id_company = pd.id_company;
+
 -- 3.9 c) LEFT JOIN трех таблиц + WHERE по атрибуту из каждой таблицы
+SELECT c.name, e.first_name, e.last_name
+FROM company c
+	LEFT JOIN employee e ON c.id_company = e.id_company
+    LEFT JOIN employee_group eg ON eg.id_employee_group = e.id_employee_group
+    WHERE eg.name = "Front-End";
+
 -- 3.9 d) INNER JOIN двух таблиц
+SELECT *
+FROM company c
+	INNER JOIN employee e ON e.id_company = c.id_company;
 
 -- Подзапросы
 -- 3.10 a) Написать запрос сусловием WHERE IN (подзапрос)
