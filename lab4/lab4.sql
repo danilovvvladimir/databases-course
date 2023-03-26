@@ -20,7 +20,7 @@ INSERT INTO employee_group (id_company, name, max_employees)
 INSERT INTO employee_group (id_company, name, max_employees) 
 	VALUES (5, "Front-End", 10);
 INSERT INTO employee_group (id_company, name, max_employees) 
-	VALUES (5, "Design-End", 14);
+	VALUES (5, "Design", 14);
 INSERT INTO employee_group (id_company, name, max_employees) 
 	VALUES (5, "Back-End", 10);
 
@@ -145,14 +145,48 @@ FROM employee;
 
 -- 3.7 Функции агрегации
 -- 3.7 a) Посчитать количество записей в таблице
+SELECT COUNT(*) AS amount_of_employees FROM employee;
+
 -- 3.7 b) Посчитать количество уникальных записей в таблице
+SELECT COUNT(DISTINCT name) AS unique_employee_group_name FROM employee_group;
+
 -- 3.7 c) Вывести уникальные значения столбца
+SELECT DISTINCT first_name
+FROM employee;
+
 -- 3.7 d) Найти максимальное значение столбца
+SELECT MAX(max_employees) AS max_employees_capacity
+FROM employee_group;
+
 -- 3.7 e) Найти минимальное значение столбца
--- 3.7 f) Написать запросCOUNT() + GROUP BY
+SELECT MIN(max_employees) AS max_employees_capacity
+FROM employee_group;
+
+-- 3.7 f) Написать запрос COUNT() + GROUP BY
+SELECT id_company, SUM(max_employees) AS max_employees_in_company
+FROM employee_group
+GROUP BY id_company;
 
 -- 3.8 SELECT GROUP BY + HAVING
 -- 3.8 a) Написать 3 разных запроса с использованием GROUP BY + HAVING.
+
+-- [1] Когда максимальное число сотрудников в компании больше 35.
+SELECT id_company, SUM(max_employees) AS max_employees_in_company
+FROM employee_group
+GROUP BY id_company
+HAVING max_employees_in_company > 35;
+
+-- [2] Когда максимальное число сотрудников в отделе больше 15.
+SELECT id_company, MAX(max_employees) AS max_employees_in_company
+FROM employee_group
+GROUP BY id_company
+HAVING max_employees_in_company > 15;
+
+-- [3] Когда минимальное число сотрудников в отделе меньше или равно 10.
+SELECT id_company, MIN(max_employees) AS max_employees_in_company
+FROM employee_group
+GROUP BY id_company
+HAVING max_employees_in_company <= 10;
 
 -- 3.9 SELECT JOIN
 -- 3.9 a) LEFT JOIN двух таблиц и WHERE по одному из атрибутов
