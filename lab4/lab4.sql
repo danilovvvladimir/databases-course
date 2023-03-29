@@ -213,6 +213,23 @@ FROM company c
 
 -- Подзапросы
 -- 3.10 a) Написать запрос сусловием WHERE IN (подзапрос)
+SELECT *
+FROM employee
+WHERE id_company IN (SELECT id_company FROM project_done);
+
 -- 3.10 b) Написать запрос SELECT atr1, atr2, (подзапрос) FROM ...
+SELECT 
+	first_name, 
+	last_name, 
+    (SELECT c.name FROM company c WHERE c.id_company = e.id_company) AS company_name
+FROM employee e;
+
 -- 3.10 c) Написать запрос вида SELECT*FROM (подзапрос)
+SELECT *
+FROM (SELECT first_name, last_name FROM employee) AS names;
+
 -- 3.10 d) Написать запрос вида SELECT * FROM table JOIN (подзапрос)ON ...
+SELECT *
+FROM project_done pd
+	JOIN (SELECT c.id_company, c.name FROM company c) as tbl
+    ON pd.id_company = tbl.id_company;
