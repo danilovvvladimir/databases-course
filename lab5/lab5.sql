@@ -2,23 +2,23 @@ USE lab5;
 
 -- 1. Добавить внешние ключи.
 ALTER TABLE booking
-    ADD CONSTRAINT booking_client_id_client_fk
+    ADD CONSTRAINT fk_booking_client_id_client
         FOREIGN KEY (id_client) REFERENCES client (id_client)
             ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE room
-    ADD CONSTRAINT room_hotel_id_hotel_fk
+    ADD CONSTRAINT fk_room_hotel_id_hotel
         FOREIGN KEY (id_hotel) REFERENCES hotel (id_hotel)
             ON UPDATE CASCADE ON DELETE CASCADE,
-    ADD CONSTRAINT room_room_category_id_room_category_fk
+    ADD CONSTRAINT fk_room_room_category_id_room_category
         FOREIGN KEY (id_room_category) REFERENCES room_category (id_room_category)
             ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE room_in_booking
-    ADD CONSTRAINT room_in_booking_booking_id_booking_fk
+    ADD CONSTRAINT fk_room_in_booking_booking_id_booking_
         FOREIGN KEY (id_booking) REFERENCES booking (id_booking)
             ON UPDATE CASCADE ON DELETE CASCADE,
-    ADD CONSTRAINT room_in_booking_room_id_room_fk
+    ADD CONSTRAINT fk_room_in_booking_room_id_room
         FOREIGN KEY (id_room) REFERENCES room (id_room)
             ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -124,7 +124,6 @@ SET @id_room = (SELECT r.id_room
 INSERT INTO room_in_booking (id_booking, id_room, checkin_date, checkout_date)
 VALUES (@id_booking, @id_room, @checkin_date, @checkout_date);
 
--- ROLLBACK;
 COMMIT;
 
 
