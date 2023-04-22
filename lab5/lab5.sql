@@ -1,26 +1,24 @@
 USE lab5;
 
+
 -- 1. Добавить внешние ключи.
 ALTER TABLE booking
     ADD CONSTRAINT fk_booking_client_id_client
-        FOREIGN KEY (id_client) REFERENCES client (id_client)
-            ON UPDATE CASCADE ON DELETE CASCADE;
+        FOREIGN KEY (id_client) REFERENCES client (id_client);
 
 ALTER TABLE room
-    ADD CONSTRAINT fk_room_hotel_id_hotel
-        FOREIGN KEY (id_hotel) REFERENCES hotel (id_hotel)
-            ON UPDATE CASCADE ON DELETE CASCADE,
+    ADD CONSTRAINT fk_room_hotel_id_hotel_fk
+        FOREIGN KEY (id_hotel) REFERENCES hotel (id_hotel);
+ALTER TABLE room
     ADD CONSTRAINT fk_room_room_category_id_room_category
-        FOREIGN KEY (id_room_category) REFERENCES room_category (id_room_category)
-            ON UPDATE CASCADE ON DELETE CASCADE;
+        FOREIGN KEY (id_room_category) REFERENCES room_category (id_room_category);
 
 ALTER TABLE room_in_booking
-    ADD CONSTRAINT fk_room_in_booking_booking_id_booking_
-        FOREIGN KEY (id_booking) REFERENCES booking (id_booking)
-            ON UPDATE CASCADE ON DELETE CASCADE,
+    ADD CONSTRAINT fk_room_in_booking_booking_id_booking
+        FOREIGN KEY (id_booking) REFERENCES booking (id_booking);
+ALTER TABLE room_in_booking
     ADD CONSTRAINT fk_room_in_booking_room_id_room
-        FOREIGN KEY (id_room) REFERENCES room (id_room)
-            ON UPDATE CASCADE ON DELETE CASCADE;
+        FOREIGN KEY (id_room) REFERENCES room (id_room);
 
 
 -- 2. Выдать информацию о клиентах гостиницы “Космос”, проживающих в номерах категории “Люкс” на 1 апреля 2019г.
@@ -29,7 +27,7 @@ FROM client c
          INNER JOIN booking b ON c.id_client = b.id_client
          INNER JOIN room_in_booking rib
                     ON b.id_booking = rib.id_booking AND rib.checkin_date <= '2019-04-01' AND
-                       '2019-04-01' < rib.checkout_date
+                       '2019-04-01' <= rib.checkout_date
          INNER JOIN room r ON rib.id_room = r.id_room
          INNER JOIN hotel h ON r.id_hotel = h.id_hotel AND h.name = 'Космос'
          INNER JOIN room_category rc ON r.id_room_category = rc.id_room_category AND rc.name = 'Люкс';
@@ -39,7 +37,7 @@ FROM client c
 SELECT DISTINCT h.name AS hotel_name, r.number AS number, rc.name AS category, r.price AS price
 FROM room r
          RIGHT JOIN room_in_booking rib ON r.id_room = rib.id_room AND
-                                           NOT (rib.checkin_date <= '2019-04-22' AND '2019-04-22' < rib.checkout_date)
+                                           NOT (rib.checkin_date <= '2019-04-22' AND '2019-04-22' <= rib.checkout_date)
          INNER JOIN hotel h ON r.id_hotel = h.id_hotel
          INNER JOIN room_category rc ON r.id_room_category = rc.id_room_category;
 
@@ -50,7 +48,7 @@ FROM client c
          INNER JOIN booking b ON c.id_client = b.id_client
          INNER JOIN room_in_booking rib
                     ON b.id_booking = rib.id_booking AND rib.checkin_date <= '2019-03-23' AND
-                       '2019-03-23' < rib.checkout_date
+                       '2019-03-23' <= rib.checkout_date
          INNER JOIN room r ON rib.id_room = r.id_room
          INNER JOIN room_category rc ON r.id_room_category = rc.id_room_category
          INNER JOIN hotel h ON r.id_hotel = h.id_hotel AND h.name = 'Космос'
@@ -67,7 +65,6 @@ FROM client c
          INNER JOIN hotel h ON r.id_hotel = h.id_hotel AND h.name = 'Космос'
 GROUP BY r.number;
 
-
 -- 6. Продлить на 2 дня дату проживания в гостинице “Космос” всем клиентам комнат
 -- категории “Бизнес”, которые заселились 10 мая.
 UPDATE booking b
@@ -77,6 +74,7 @@ UPDATE booking b
     INNER JOIN room_category rc ON r.id_room_category = rc.id_room_category AND rc.name = 'Бизнес'
 SET rib.checkout_date = DATE_ADD(rib.checkout_date, INTERVAL 2 DAY);
 
+-- check it out
 SELECT c.name AS client_name, rib.checkout_date AS checkout_date
 FROM client c
          INNER JOIN booking b ON c.id_client = b.id_client
@@ -84,8 +82,7 @@ FROM client c
          INNER JOIN room r ON rib.id_room = r.id_room
          INNER JOIN hotel h ON r.id_hotel = h.id_hotel AND h.name = 'Космос'
          INNER JOIN room_category rc ON r.id_room_category = rc.id_room_category AND rc.name = 'Бизнес';
-
-
+         
 -- 7. Найти все "пересекающиеся" варианты проживания. Правильное состояние: не
 -- может быть забронирован один номер на одну дату несколько раз, т.к. нельзя
 -- заселиться нескольким клиентам в один номер. Записи в таблице
@@ -98,8 +95,7 @@ FROM room_in_booking rib1
 WHERE rib1.id_room_in_booking <> rib2.id_room_in_booking
   AND rib1.checkin_date <= rib2.checkin_date
   AND rib1.checkout_date > rib2.checkout_date;
-
-
+  
 -- 8. Создать бронирование в транзакции.
 START TRANSACTION;
 
@@ -124,8 +120,8 @@ SET @id_room = (SELECT r.id_room
 INSERT INTO room_in_booking (id_booking, id_room, checkin_date, checkout_date)
 VALUES (@id_booking, @id_room, @checkin_date, @checkout_date);
 
+-- ROLLBACK;
 COMMIT;
-
 
 -- 9. Добавить необходимые индексы для всех таблиц.
 ALTER TABLE booking
